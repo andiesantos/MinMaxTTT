@@ -81,6 +81,17 @@ public class Game {
                         button.setText("O");
                     }
                     turnNumber += 1;
+
+                    if (checker() == "X") {
+                        JOptionPane.showMessageDialog(frame, "X wins!");
+                        resetFunc();
+                    } else if (checker() == "O") {
+                        JOptionPane.showMessageDialog(frame, "O wins!");
+                        resetFunc();
+                    } else if (checker() == "DRAW") {
+                        JOptionPane.showMessageDialog(frame, "Draw");
+                        resetFunc();
+                    }
                 }
             }
         };
@@ -102,6 +113,16 @@ public class Game {
         reset.addActionListener(resetAL);
     }
 
+
+    public void resetFunc() {
+        for (int i=0; i<3; i++) {
+            for (int j=0; j<3; j++) {
+                buttons[i][j].setText("");
+            } 
+        }
+        turnNumber = 0;
+    }
+
     // Temporary colors until PRETTIER NOTICE
     public void colorize() {
         pScore.setForeground(new Color(111, 156, 235));
@@ -116,5 +137,107 @@ public class Game {
                 buttons[i][j].setForeground(new Color(111, 156, 235));
             }
         }
+    }
+
+    public String checker() {
+        int countX = 0;
+        int countO = 0;
+
+        /*rows*/
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (buttons[i][j].getText() == "O") {
+                    countO++;
+                } else if (buttons[i][j].getText() == "X") {
+                    countX++;
+                }
+            }
+
+            if (countX == 3) {
+                return "X";
+            } else if (countO == 3) {
+                return "O";
+            }
+            
+            countX = 0;
+            countO = 0;
+        }
+
+        /*cols*/
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (buttons[j][i].getText() == "O") {
+                    countO++;
+                } else if (buttons[j][i].getText() == "X") {
+                    countX++;
+                }
+
+            }
+    
+            if (countX == 3) {
+                return "X";
+            } else if (countO == 3) {
+                return "O";
+            }
+
+            countX = 0;
+            countO = 0;
+        }
+
+        /*diagonal to the left*/
+        for (int i = 0; i < 3; i++) {
+            if (buttons[i][i].getText() == "O") {
+                countO++;
+            } else if (buttons[i][i].getText() == "X") {
+                countX++;
+            }
+        }
+        
+        if (countX == 3) {
+            return "X";
+        } else if (countO == 3) {
+            return "O";
+        }
+
+        countX = 0;
+        countO = 0;
+
+        /*diagonal to the right*/
+        for (int i = 0; i < 3; i++) {
+            if (buttons[i][2-i].getText() == "O") {
+                countO++;
+            } else if (buttons[i][2-i].getText() == "X") {
+                countX++;
+            }
+        }
+        
+        if (countX == 3) {
+            return "X";
+        } else if (countO == 3) {
+            return "O";
+        }
+
+        countX = 0;
+        countO = 0;
+
+        /*draw*/
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (buttons[i][j].getText() == "O") {
+                    countO++;
+                } else if (buttons[i][j].getText() == "X") {
+                    countX++;
+                }
+            }
+
+        }
+
+        if (countX == 5) {
+            countX = 0;
+            countO = 0;
+            return "DRAW";
+        }
+
+        return "";
     }
 }
