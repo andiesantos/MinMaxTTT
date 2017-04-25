@@ -14,6 +14,8 @@ public class Game {
     private JPanel buttonPanel;
     private JButton[][] buttons;
     private int turnNumber;
+    private int[][] board;
+    private MinMax minmax;
 
     // Set up the board 
     public Game() {
@@ -49,7 +51,7 @@ public class Game {
             for (int j=0; j<3; j++) {
                 buttons[i][j] = new JButton();
                 // Set ActionListeners
-                setAl(buttons[i][j]);
+                setAl(buttons[i][j], i, j);
                 // Put this button into the board
                 buttonPanel.add(buttons[i][j]);
             }
@@ -69,26 +71,46 @@ public class Game {
         container.add(mainPanel);
         frame.pack();
         frame.setVisible(true);
+
+        // Create a copy of the board (used for state)
+        board = new int[3][3]; // 1 = x, 2 = z0
+
+        // Used for deciding the next AI move
+        minmax = new MinMax();
     }
 
-    public void setAl(JButton button) {
+    public void setAl(JButton button, int x, int y) {
         ActionListener al = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (button.getText().equals("")) {   
                     if (turnNumber % 2 == 0) {
                         button.setText("X");
+                        board[x][y] = 1;
+                        State s = new State(board);
+                        s.setMaxNode();
+                        minmax.setBoard(board);
+                        minmax.getMax();
                     } else {
                         button.setText("O");
+                        board[x][y] = 2;
+                        minmax.setBoard(board);
                     }
                     turnNumber += 1;
+                    minmax.printBoard();
 
                     if (checker() == "X") {
+                        minmax.setWinner("X");
+                        // minmax.winBoard("X");
                         JOptionPane.showMessageDialog(frame, "X wins!");
                         resetFunc();
                     } else if (checker() == "O") {
+                        minmax.setWinner("O");
+                        // minmax.winBoard("O");
                         JOptionPane.showMessageDialog(frame, "O wins!");
                         resetFunc();
                     } else if (checker() == "DRAW") {
+                        minmax.setWinner("DRAW");
+                        // minmax.winBoard("DRAW");
                         JOptionPane.showMessageDialog(frame, "Draw");
                         resetFunc();
                     }
