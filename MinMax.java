@@ -5,16 +5,21 @@ import java.util.ArrayList;
 
 public class MinMax {
 	private State currentState;
-	private ArrayList<State> states;
+	private ArrayList<State> nextStates;
+	private ArrayList<int[]> moves;
+	private int moveCount, nextMove;
 
 	public MinMax(State s) {
-		states = new ArrayList<State>();
+		nextStates = new ArrayList<State>();
+		moves = new ArrayList<int[]>();
 		setState(s);
 		currentState.printState();
+		value(s);
 	}
 
 	public void setState(State s) {
 		this.currentState = s;
+		s.maxNode = true; // starting state maximizes the chances of the AI win
 	}
 
 	public int max_value(State s) {
@@ -28,18 +33,20 @@ public class MinMax {
 	}
 
 	public State value(State s) {
-		// Return a utility state and store it in an ArrayList
-		if (s.checkIfUtility() == true) {
-			states.add(s);
-		} else if ()
+		System.out.println("Printing value...");
+		if (s.checkIfTerminal() == true) {
+			int[] util = s.getUtility();
+			System.out.println(util[0] + " " + util[1]);
+		} else {
+			if (s.maxNode == true) { // max node
+				s.m = (Integer.MAX_VALUE) * -1;
+				// Check successors
+			} else { // min node
+				s.m = Integer.MAX_VALUE;
+				// Check successors
+			}
+		}
 		return null;
 	}
 
-	public State bestMove() {
-		/*
-			Evaluates all the States and chooses the best one to maximize 
-			chances of AI win
-		*/
-		return null;
-	}
 }

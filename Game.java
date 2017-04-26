@@ -79,6 +79,7 @@ public class Game {
         // For testing purposes only
         State state = new State(board);
         state.setHardcode();
+        // state.setFinishedState("X");
 
         // Used for deciding the next AI move
         minmax = new MinMax(state);
@@ -163,7 +164,7 @@ public class Game {
     public String checker() {
         int countX = 0;
         int countO = 0;
-
+        System.out.println("In checker");
         /*rows*/
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
