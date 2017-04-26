@@ -1,70 +1,45 @@
-import java.util.LinkedList;
+/*
+	This class will be used to check the best movement of the AI upon its turn.
+*/
+import java.util.ArrayList;
 
 public class MinMax {
-	public int[][] board;
-	public int max, xWin, oWin;
-	public String winner;
-	public boolean utility;
-	public LinkedList<State> states;
+	private State currentState;
+	private ArrayList<State> states;
 
-	public MinMax() {
-		this.winner = "";
-		this.xWin = 0;
-		this.oWin = 0;
-		this.states = new LinkedList<State>();
+	public MinMax(State s) {
+		states = new ArrayList<State>();
+		setState(s);
+		currentState.printState();
 	}
 
-	public void printBoard() {
-		System.out.println("-----");
-		for (int i=0; i<3; i++) {
-			for (int j=0; j<3; j++) {
-				System.out.print(this.board[i][j] + " ");
-			}
-			System.out.println("");
-		}
+	public void setState(State s) {
+		this.currentState = s;
 	}
 
-	public int getMax() {
-		return this.max = 99999;
-		// do max(m,v) magic here
+	public int max_value(State s) {
+		// Get the max value of each successor (state)
+		return 0;
+	}
+	
+	public int min_value(State s) {
+		// Get the min value of each successor (state)
+		return 0;
 	}
 
-	public void setBoard(int[][] board) {
-		this.board = board;
+	public State value(State s) {
+		// Return a utility state and store it in an ArrayList
+		if (s.checkIfUtility() == true) {
+			states.add(s);
+		} else if ()
+		return null;
 	}
 
-	public int[][] value() {
-		if (this.utility == true) { // Utility state
-			return this.board;
-		}
-		return this.board;
+	public State bestMove() {
+		/*
+			Evaluates all the States and chooses the best one to maximize 
+			chances of AI win
+		*/
+		return null;
 	}
-
-	public void setWinner(String a) {
-		this.winner = a;
-		winBoard(a);
-	}
-
-	public boolean winBoard(String a) { // Utility state
-		if (a.equals("X")) {
-			this.xWin = 1;
-			this.oWin = -1;
-			this.utility = true;
-		} else if (a.equals("O")) {
-			this.xWin = -1;
-			this.oWin = 1;
-			this.utility = true;
-		} else if (a.equals("DRAW")) {
-			this.xWin = 0;
-			this.oWin = 0;
-			this.utility = true;
-		} else {
-			this.xWin = 0;
-			this.oWin = 0;
-			this.utility = false;
-		}
-
-		return this.utility;
-	}
-
 }

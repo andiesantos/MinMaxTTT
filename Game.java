@@ -16,6 +16,7 @@ public class Game {
     private int turnNumber;
     private int[][] board;
     private MinMax minmax;
+    private Boolean playerFirst;
 
     // Set up the board 
     public Game() {
@@ -75,8 +76,12 @@ public class Game {
         // Create a copy of the board (used for state)
         board = new int[3][3]; // 1 = x, 2 = z0
 
+        // For testing purposes only
+        State state = new State(board);
+        state.setHardcode();
+
         // Used for deciding the next AI move
-        minmax = new MinMax();
+        minmax = new MinMax(state);
     }
 
     public void setAl(JButton button, int x, int y) {
@@ -86,32 +91,26 @@ public class Game {
                     if (turnNumber % 2 == 0) {
                         button.setText("X");
                         board[x][y] = 1;
-                        State s = new State(board);
-                        s.setMaxNode();
-                        minmax.setBoard(board);
-                        minmax.getMax();
                     } else {
                         button.setText("O");
                         board[x][y] = 2;
-                        minmax.setBoard(board);
                     }
                     turnNumber += 1;
-                    minmax.printBoard();
 
                     if (checker() == "X") {
-                        minmax.setWinner("X");
-                        // minmax.winBoard("X");
                         JOptionPane.showMessageDialog(frame, "X wins!");
+                        State finished = new State(board);
+                        finished.setFinishedState("X");
                         resetFunc();
                     } else if (checker() == "O") {
-                        minmax.setWinner("O");
-                        // minmax.winBoard("O");
                         JOptionPane.showMessageDialog(frame, "O wins!");
+                        State finished = new State(board);
+                        finished.setFinishedState("O");
                         resetFunc();
                     } else if (checker() == "DRAW") {
-                        minmax.setWinner("DRAW");
-                        // minmax.winBoard("DRAW");
                         JOptionPane.showMessageDialog(frame, "Draw");
+                        State finished = new State(board);
+                        finished.setFinishedState("DRAW");
                         resetFunc();
                     }
                 }
