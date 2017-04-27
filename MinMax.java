@@ -41,9 +41,11 @@ public class MinMax {
 			if (s.maxNode == true) { // max node
 				s.m = (Integer.MAX_VALUE) * -1;
 				// Check successors
+				s.checkSuccessors();
 			} else { // min node
 				s.m = Integer.MAX_VALUE;
 				// Check successors
+				s.checkSuccessors();
 			}
 		}
 		return null;

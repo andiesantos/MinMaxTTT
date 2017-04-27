@@ -5,10 +5,10 @@ public class State {
 	public int[] utility, movement;
 	public int x, o, m, v; // Refer to handout for use of the variables
 	public Boolean xWin, oWin, draw, maxNode;
-	public ArrayList<int[][]> nextStates; // holder of result(s, a)
+	public ArrayList<State> nextStates; // holder of result(s, a)
 
 	public State(int[][] board) {
-		nextStates = new ArrayList<int[][]>();
+		nextStates = new ArrayList<State>();
 		setBoard(board);
 		xWin = false;
 		oWin = false;
@@ -128,8 +128,34 @@ public class State {
 	}
 
 	public void setNextState(int[] movement) {
-		int[][] newState = this.board;
-		newState[movement[0]][movement[1]] = movement[2];
+		int[][] newStateBoard = new int[3][3];
+		for (int i=0; i<3; i++) {
+			for (int j=0; j<3; j++) {
+				newStateBoard[i][j] = board[i][j];
+			}
+		}
+		newStateBoard[movement[0]][movement[1]] = movement[2];
+		State newState = new State(newStateBoard);
+		if (this.maxNode == true) {
+			newState.maxNode = false;
+		} else {
+			newState.maxNode = true;
+		}
 		nextStates.add(newState);
+		printNextStates();
+	}
+
+	public void printNextStates() {
+		System.out.println("PRINT NEXT STATES");
+		for (int counter=0; counter<nextStates.size(); counter++) {
+			System.out.println("=================");
+			int[][] current = nextStates.get(counter).board;
+			for (int i=0; i<3; i++) {
+				for (int j=0; j<3; j++) {
+					System.out.print(current[i][j] + " ");
+				}
+				System.out.println("");
+			}
+		}
 	}
 }
