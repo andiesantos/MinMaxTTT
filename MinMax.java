@@ -23,8 +23,25 @@ public class MinMax {
 	}
 
 	public int max_value(State s) {
+		int v = 0;
 		// Get the max value of each successor (state)
-		return 0;
+		System.out.println(s.m);
+		if (s.nextStates.size() != 0) {
+			for (int i=0; i<s.nextStates.size(); i++) {
+				State next = s.nextStates.get(i);
+				next.checkSuccessors();
+				if (next.nextStates.size() != 0) {
+					v = value(next.nextStates.get(i));
+					// max(m,v)
+				} else {
+					v = next.utility[0];
+				}
+				if (v > s.m) {
+					s.m = v;
+				}
+			}
+		}
+		return s.m;
 	}
 	
 	public int min_value(State s) {
@@ -32,23 +49,23 @@ public class MinMax {
 		return 0;
 	}
 
-	public State value(State s) {
+	public int value(State s) {
 		System.out.println("Printing value...");
 		if (s.checkIfTerminal() == true) {
 			int[] util = s.getUtility();
 			System.out.println(util[0] + " " + util[1]);
+			return util[0];
 		} else {
 			if (s.maxNode == true) { // max node
 				s.m = (Integer.MAX_VALUE) * -1;
-				// Check successors
 				s.checkSuccessors();
+				return max_value(s);
 			} else { // min node
 				s.m = Integer.MAX_VALUE;
-				// Check successors
 				s.checkSuccessors();
+				return min_value(s);
 			}
 		}
-		return null;
 	}
 
 }
