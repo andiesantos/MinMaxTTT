@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
 
 public class Game {
     /* Elements used to build the board */
@@ -21,6 +22,7 @@ public class Game {
 
     // Set up the board 
     public Game() {
+        Random rand = new Random();
         // Turn initialize to 0
         turnNumber = 0;
         // Frame setup
@@ -83,6 +85,18 @@ public class Game {
 
         // Used for deciding the next AI move
         //minmax = new MinMax(state);
+        // select random tile to put AI's first move in
+        int x = rand.nextInt()%2;
+        int y = rand.nextInt()%2;
+        if (x < 0) {
+            x = x * -1;
+        }
+        if (y < 0) {
+            y = y * -1;
+        }
+        System.out.println(x + ", " + y);
+        buttons[x][y].setText("X");
+        board[x][y] = 1;
     }
 
     public void setAl(JButton button, int x, int y) {
@@ -90,14 +104,19 @@ public class Game {
             public void actionPerformed(ActionEvent e) {
                 if (button.getText().equals("")) {   
                     if (turnNumber % 2 == 0) {
-                        button.setText("X");
-                        board[x][y] = 1;
-                    } else {
                         button.setText("O");
                         board[x][y] = 2;
+                        // Create a new State class with the current setup
                         State current = new State(board);
                         current.maxNode = true;
-                        MinMax mm = new MinMax(current);
+                        // Do MinMax on the current state
+                        MinMax mm = new MinMax(current, true);
+                        // Get the next move from MinMax
+                        int[] nextMove = mm.getNextMove();
+                        // Set the board according to next move
+                        board[nextMove[0]][nextMove[1]] = 1;
+                        buttons[nextMove[0]][nextMove[1]].setText("X");
+                        turnNumber += 1;
                     }
                     turnNumber += 1;
 
@@ -148,6 +167,7 @@ public class Game {
 
 
     public void resetFunc() {
+        Random rand = new Random();
         for (int i=0; i<3; i++) {
             for (int j=0; j<3; j++) {
                 board[i][j] = 0;
@@ -155,6 +175,18 @@ public class Game {
             } 
         }
         turnNumber = 0;
+        // select random tile to put AI's first move in
+        int x = rand.nextInt()%2;
+        int y = rand.nextInt()%2;
+        if (x < 0) {
+            x = x * -1;
+        }
+        if (y < 0) {
+            y = y * -1;
+        }
+        System.out.println(x + ", " + y);
+        buttons[x][y].setText("X");
+        board[x][y] = 1;
     }
 
     // Temporary colors until PRETTIER NOTICE

@@ -4,26 +4,41 @@
 import java.util.ArrayList;
 
 public class MinMax {
-	private State currentState;
+	private State currentState, next;
 	private ArrayList<State> nextStates;
 	private int moveCount, nextMove;
 	private int[] toPut;
 
-	public MinMax(State s) {
+	public MinMax(State s, Boolean mm) {
 		nextStates = new ArrayList<State>();
-		moves = new ArrayList<int[]>();
-		setState(s);
+		setState(s, mm);
 		currentState.printState();
 		System.out.println("FINALLY " + value(s));
 		System.out.println("====FINAL MOVE " + s.nextMove + "====");
-		State next = s.nextStates.get(s.nextMove);
+		next = s.nextStates.get(s.nextMove);
 		s.printState();
 		next.printState();
 	}
 
-	public void setState(State s) {
+	public int[] getNextMove() {
+		// Compare new state with the current board
+		int[] nextMove = new int[2];
+		for (int i=0; i<3; i++) {
+			for (int j=0; j<3; j++) {
+				if (currentState.board[i][j] != next.board[i][j]) {
+					nextMove[0] = i;
+					nextMove[1] = j;
+					break;
+				}
+			}
+		}
+		return nextMove;
+	}
+
+	public void setState(State s, Boolean mm) {
 		this.currentState = s;
-		s.maxNode = true; // starting state maximizes the chances of the AI win
+		s.maxNode = mm; // starting state maximizes the chances of the AI win
+		// if true, max; else, min
 	}
 
 	public int max_value(State s) {
