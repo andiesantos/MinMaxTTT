@@ -15,6 +15,7 @@ public class Game {
     private JButton[][] buttons;
     private int turnNumber;
     private int[][] board;
+    private int pScoreInt = 0, aiScoreInt = 0, drawScoreInt = 0;
     private MinMax minmax;
     private Boolean playerFirst;
 
@@ -33,11 +34,11 @@ public class Game {
         northPanel = new JPanel(new GridLayout(2,1));
         scoresPanel = new JPanel(new GridLayout(1, 3));
         // Score labels setup
-        pScore = new JLabel("Player: 0");
+        pScore = new JLabel("Player: " + pScoreInt);
         pScore.setHorizontalAlignment(SwingConstants.CENTER);
-        aiScore = new JLabel("AI: 0");
+        aiScore = new JLabel("AI: " + aiScoreInt);
         aiScore.setHorizontalAlignment(SwingConstants.CENTER);
-        drawScore = new JLabel("Draw: 0");
+        drawScore = new JLabel("Draw: " + drawScoreInt);
         drawScore.setHorizontalAlignment(SwingConstants.CENTER);
         // Reset button setup
         reset = new JButton("RESET GAME");
@@ -78,11 +79,10 @@ public class Game {
 
         // For testing purposes only
         State state = new State(board);
-        state.setHardcode();
         // state.setFinishedState("X");
 
         // Used for deciding the next AI move
-        minmax = new MinMax(state);
+        //minmax = new MinMax(state);
     }
 
     public void setAl(JButton button, int x, int y) {
@@ -95,6 +95,9 @@ public class Game {
                     } else {
                         button.setText("O");
                         board[x][y] = 2;
+                        State current = new State(board);
+                        current.maxNode = true;
+                        MinMax mm = new MinMax(current);
                     }
                     turnNumber += 1;
 
@@ -104,16 +107,22 @@ public class Game {
                         JOptionPane.showMessageDialog(frame, "X wins!");
                         State finished = new State(board);
                         finished.setFinishedState("X");
+                        aiScoreInt += 1;
+                        aiScore.setText("AI: " + aiScoreInt);
                         resetFunc();
                     } else if (current.checker() == "O") {
                         JOptionPane.showMessageDialog(frame, "O wins!");
                         State finished = new State(board);
                         finished.setFinishedState("O");
+                        pScoreInt += 1;
+                        pScore.setText("Player: " + aiScoreInt);
                         resetFunc();
                     } else if (current.checker() == "DRAW") {
                         JOptionPane.showMessageDialog(frame, "Draw");
                         State finished = new State(board);
                         finished.setFinishedState("DRAW");
+                        drawScoreInt += 1;
+                        drawScore.setText("Draw: " + drawScoreInt);
                         resetFunc();
                     }
                 }

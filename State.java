@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class State {
 	public int[][] board;
 	public int[] utility, movement;
-	public int x, o, m, v; // Refer to handout for use of the variables
+	public int x, o, m, v, nextMove;; // Refer to handout for use of the variables
 	public Boolean xWin, oWin, draw, maxNode;
 	public ArrayList<State> nextStates; // holder of result(s, a)
 
@@ -30,7 +30,7 @@ public class State {
 		// 1 0 1
 		// 1 2 0
 		// 2 2 0
-
+		/*
 		this.board[0][0] = 1;
 		// this.board[0][1] = 1; // comment this out
 		this.board[0][2] = 1;
@@ -38,6 +38,21 @@ public class State {
 		this.board[1][1] = 2;
 		this.board[2][0] = 2;
 		this.board[2][1] = 2;
+		*/
+
+		/*
+			0 2 0
+			1 2 1
+			2 1 0 || 0 0 0
+		*/
+
+		this.board[0][1] = 2;
+		this.board[1][0] = 1;
+		this.board[1][1] = 2;
+		this.board[1][2] = 1;
+		//this.board[2][0] = 2; // comment this out
+		//this.board[2][1] = 1; // comment this out
+
 	}
 
 	public void setBoard(int[][] setboard) {
@@ -46,6 +61,12 @@ public class State {
 
 	public void printState() {
 		System.out.println("-----");
+		System.out.print("NODE TYPE: ");
+		if (!maxNode) {
+			System.out.println("MIN");
+		} else {
+			System.out.println("MAX");
+		}
 		for (int i=0; i<3; i++) {
 			for (int j=0; j<3; j++) {
 				System.out.print(board[i][j] + " ");
@@ -242,6 +263,7 @@ public class State {
 				}
 			}
 		}
+		//printNextStates();
 	}
 
 	public void setNextState(int[] movement) {
@@ -259,7 +281,6 @@ public class State {
 			newState.maxNode = true;
 		}
 		nextStates.add(newState);
-		printNextStates();
 	}
 
 	public void printNextStates() {
