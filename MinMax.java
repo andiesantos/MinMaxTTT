@@ -1,70 +1,152 @@
-import java.util.LinkedList;
+/*
+	This class will be used to check the best movement of the AI upon its turn.
+*/
+import java.util.ArrayList;
 
 public class MinMax {
-	public int[][] board;
-	public int max, xWin, oWin;
-	public String winner;
-	public boolean utility;
-	public LinkedList<State> states;
+	private State currentState, next;
+	private ArrayList<State> nextStates;
+	private int moveCount, nextMove;
+	private int[] toPut;
+	private String name;
 
-	public MinMax() {
-		this.winner = "";
-		this.xWin = 0;
-		this.oWin = 0;
-		this.states = new LinkedList<State>();
+	public MinMax(State s, Boolean mm) {
+		nextStates = new ArrayList<State>();
+		name = setState(s, mm);
+
+		if (name.equals("draw")) {
+			System.out.println("draw");
+		}
+		//currentState.printState();
+		////System.out.println("FINALLY " + value(s));
+		value(s);
+		// if (value(s) == 1000) { // may error
+		// }
+		System.out.println("-------------------------------------------");
+		//System.out.println("====FINAL MOVE " + s.nextMove + "====");
+		next = s.nextStates.get(s.nextMove);
+
+		System.out.println("\n\n\n-------------------------------------------");
+		// if (s.nextMove == 1000)
+		next.printState();
+		//s.printState();
+		//next.printState();
 	}
 
-	public void printBoard() {
-		System.out.println("-----");
+	public int[] getNextMove() {
+		// Compare new state with the current board
+		int[] nextMove = new int[2];
+		nextMove[0] = 10;
+		nextMove[1] = 10;
 		for (int i=0; i<3; i++) {
 			for (int j=0; j<3; j++) {
-				System.out.print(this.board[i][j] + " ");
+				if (currentState.board[i][j] != next.board[i][j]) {
+					nextMove[0] = i;
+					nextMove[1] = j;
+					break;
+				}
 			}
-			System.out.println("");
 		}
+		return nextMove;
 	}
 
-	public int getMax() {
-		return this.max = 99999;
-		// do max(m,v) magic here
+	public String setState(State s, Boolean mm) {
+		this.currentState = s;
+		s.maxNode = mm; // starting state maximizes the chances of the AI win
+		int countO = 0;
+		int countX = 0;
+		// if true, max; else, min
+		for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (s.board[i][j] == 2) {
+                    countO++;
+                } else if (s.board[i][j] == 1) {
+                    countX++;
+                }
+            }
+
+        }
+
+        if ((countX == 5) && (countO == 4)) {
+            countX = 0;
+            countO = 0;
+            return "draw";
+        }
+        return "";
 	}
 
-	public void setBoard(int[][] board) {
-		this.board = board;
-	}
-
-	public int[][] value() {
-		if (this.utility == true) { // Utility state
-			return this.board;
+	public int max_value(State s) {
+		int v = 0;
+		Integer m = (Integer.MAX_VALUE) * -1;
+		State next;
+		// Get the max value of each successor (state)
+		//System.out.println(s.m);
+		if (s.nextStates.size() != 0) {
+			for (int i=0; i<s.nextStates.size(); i++) {
+				next = s.nextStates.get(i);
+				v = value(next);
+				if (v > m) {
+					m = v;
+					s.nextMove = i;
+					//System.out.println("Set new nextMove");
+				}
+			}
+			//System.out.println("====NEXT MAX MOVE " + s.nextMove + "====");
+			s.printState();
+			next = s.nextStates.get(s.nextMove);
+			next.printState();
 		}
-		return this.board;
+		//System.out.println("\n\n\n");
+		return m;
+	}
+	
+	public int min_value(State s) {
+		int v = 0;
+		Integer m = Integer.MAX_VALUE;
+		State next;
+		// Get the min value of each successor (state)
+		//System.out.println(s.m);
+		if (s.nextStates.size() != 0) {
+			for (int i=0; i<s.nextStates.size(); i++) {
+				next = s.nextStates.get(i);
+				v = value(next);
+				if (v < m) {
+					m = v;
+					s.nextMove = i;
+					//System.out.println("Set new nextMove");
+				}
+			}
+			//System.out.println("====NEXT MIN MOVE " + s.nextMove + "====");
+			s.printState();
+			next = s.nextStates.get(s.nextMove);
+			next.printState();
+
+		}
+		//System.out.println("\n\n\n");
+		return m;
 	}
 
-	public void setWinner(String a) {
-		this.winner = a;
-		winBoard(a);
-	}
-
-	public boolean winBoard(String a) { // Utility state
-		if (a.equals("X")) {
-			this.xWin = 1;
-			this.oWin = -1;
-			this.utility = true;
-		} else if (a.equals("O")) {
-			this.xWin = -1;
-			this.oWin = 1;
-			this.utility = true;
-		} else if (a.equals("DRAW")) {
-			this.xWin = 0;
-			this.oWin = 0;
-			this.utility = true;
+	public int value(State s) {
+		int ret = 1000;
+		if (s.checkIfTerminal() == true) {
+			int[] util = s.getUtility();
+			//System.out.println(util[0] + " " + util[1]);
+			s.nextMove = 0;
+			ret = util[0];
+			return ret;
 		} else {
-			this.xWin = 0;
-			this.oWin = 0;
-			this.utility = false;
+			if (s.maxNode == true) { // max node
+				// s.m = (Integer.MAX_VALUE) * -1;
+				s.checkSuccessors();
+				ret = max_value(s);
+				return ret;
+			} else { // min node
+				// s.m = Integer.MAX_VALUE;
+				s.checkSuccessors();
+				ret = min_value(s);
+				return ret;
+			}
 		}
-
-		return this.utility;
 	}
 
 }

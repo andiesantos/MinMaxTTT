@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
 
 public class Game {
     /* Elements used to build the board */
@@ -15,10 +16,13 @@ public class Game {
     private JButton[][] buttons;
     private int turnNumber;
     private int[][] board;
+    private int pScoreInt = 0, aiScoreInt = 0, drawScoreInt = 0;
     private MinMax minmax;
+    private Boolean playerFirst;
 
     // Set up the board 
     public Game() {
+        Random rand = new Random();
         // Turn initialize to 0
         turnNumber = 0;
         // Frame setup
@@ -32,11 +36,11 @@ public class Game {
         northPanel = new JPanel(new GridLayout(2,1));
         scoresPanel = new JPanel(new GridLayout(1, 3));
         // Score labels setup
-        pScore = new JLabel("Player: 0");
+        pScore = new JLabel("Player: " + pScoreInt);
         pScore.setHorizontalAlignment(SwingConstants.CENTER);
-        aiScore = new JLabel("AI: 0");
+        aiScore = new JLabel("AI: " + aiScoreInt);
         aiScore.setHorizontalAlignment(SwingConstants.CENTER);
-        drawScore = new JLabel("Draw: 0");
+        drawScore = new JLabel("Draw: " + drawScoreInt);
         drawScore.setHorizontalAlignment(SwingConstants.CENTER);
         // Reset button setup
         reset = new JButton("RESET GAME");
@@ -75,8 +79,21 @@ public class Game {
         // Create a copy of the board (used for state)
         board = new int[3][3]; // 1 = x, 2 = z0
 
+        // For testing purposes only
+        /*State state = new State(board);
+        // state.setFinishedState("X");
+
         // Used for deciding the next AI move
-        minmax = new MinMax();
+        //minmax = new MinMax(state);
+        // select random tile to put AI's first move in
+        state.maxNode = true;
+        // Do MinMax on the current state
+        MinMax mm = new MinMax(state, true);
+        // Get the next move from MinMax
+        int[] nextMove = mm.getNextMove();
+        // Set the board according to next move
+        board[nextMove[0]][nextMove[1]] = 1;
+        buttons[nextMove[0]][nextMove[1]].setText("X");*/
     }
 
     public void setAl(JButton button, int x, int y) {
@@ -86,32 +103,47 @@ public class Game {
                     if (turnNumber % 2 == 0) {
                         button.setText("X");
                         board[x][y] = 1;
-                        State s = new State(board);
-                        s.setMaxNode();
-                        minmax.setBoard(board);
-                        minmax.getMax();
-                    } else {
-                        button.setText("O");
-                        board[x][y] = 2;
-                        minmax.setBoard(board);
+                        // Create a new State class with the current setup
+                        State current = new State(board);
+                        current.maxNode = false;
+                        // Do MinMax on the current state
+                        MinMax mm = new MinMax(current, false);
+
+                        // if (mm == null) {
+                        //     System.out.println("Asfasf");
+                        // }
+
+                        // Get the next move from MinMax
+                        int[] nextMove = mm.getNextMove();
+                        // Set the board according to next move
+                        board[nextMove[0]][nextMove[1]] = 2;
+                        buttons[nextMove[0]][nextMove[1]].setText("O");
+                        turnNumber += 1;
                     }
                     turnNumber += 1;
-                    minmax.printBoard();
 
-                    if (checker() == "X") {
-                        minmax.setWinner("X");
-                        // minmax.winBoard("X");
+                    State current = new State(board);
+
+                    if (current.checker() == "X") {
                         JOptionPane.showMessageDialog(frame, "X wins!");
+                        State finished = new State(board);
+                        finished.setFinishedState("X");
+                        aiScoreInt += 1;
+                        aiScore.setText("AI: " + aiScoreInt);
                         resetFunc();
-                    } else if (checker() == "O") {
-                        minmax.setWinner("O");
-                        // minmax.winBoard("O");
+                    } else if (current.checker() == "O") {
                         JOptionPane.showMessageDialog(frame, "O wins!");
+                        State finished = new State(board);
+                        finished.setFinishedState("O");
+                        pScoreInt += 1;
+                        pScore.setText("Player: " + aiScoreInt);
                         resetFunc();
-                    } else if (checker() == "DRAW") {
-                        minmax.setWinner("DRAW");
-                        // minmax.winBoard("DRAW");
+                    } else if (current.checker() == "DRAW") {
                         JOptionPane.showMessageDialog(frame, "Draw");
+                        State finished = new State(board);
+                        finished.setFinishedState("DRAW");
+                        drawScoreInt += 1;
+                        drawScore.setText("Draw: " + drawScoreInt);
                         resetFunc();
                     }
                 }
@@ -137,12 +169,29 @@ public class Game {
 
 
     public void resetFunc() {
+        Random rand = new Random();
         for (int i=0; i<3; i++) {
             for (int j=0; j<3; j++) {
+                board[i][j] = 0;
                 buttons[i][j].setText("");
             } 
         }
         turnNumber = 0;
+        // select random tile to put AI's first move in
+        State state = new State(board);
+        // state.setFinishedState("X");
+
+        // Used for deciding the next AI move
+        //minmax = new MinMax(state);
+        // select random tile to put AI's first move in
+        state.maxNode = true;
+        // Do MinMax on the current state
+        MinMax mm = new MinMax(state, true);
+        // Get the next move from MinMax
+        int[] nextMove = mm.getNextMove();
+        // Set the board according to next move
+        board[nextMove[0]][nextMove[1]] = 1;
+        buttons[nextMove[0]][nextMove[1]].setText("X");
     }
 
     // Temporary colors until PRETTIER NOTICE
@@ -161,105 +210,5 @@ public class Game {
         }
     }
 
-    public String checker() {
-        int countX = 0;
-        int countO = 0;
-
-        /*rows*/
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (buttons[i][j].getText() == "O") {
-                    countO++;
-                } else if (buttons[i][j].getText() == "X") {
-                    countX++;
-                }
-            }
-
-            if (countX == 3) {
-                return "X";
-            } else if (countO == 3) {
-                return "O";
-            }
-            
-            countX = 0;
-            countO = 0;
-        }
-
-        /*cols*/
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (buttons[j][i].getText() == "O") {
-                    countO++;
-                } else if (buttons[j][i].getText() == "X") {
-                    countX++;
-                }
-
-            }
     
-            if (countX == 3) {
-                return "X";
-            } else if (countO == 3) {
-                return "O";
-            }
-
-            countX = 0;
-            countO = 0;
-        }
-
-        /*diagonal to the left*/
-        for (int i = 0; i < 3; i++) {
-            if (buttons[i][i].getText() == "O") {
-                countO++;
-            } else if (buttons[i][i].getText() == "X") {
-                countX++;
-            }
-        }
-        
-        if (countX == 3) {
-            return "X";
-        } else if (countO == 3) {
-            return "O";
-        }
-
-        countX = 0;
-        countO = 0;
-
-        /*diagonal to the right*/
-        for (int i = 0; i < 3; i++) {
-            if (buttons[i][2-i].getText() == "O") {
-                countO++;
-            } else if (buttons[i][2-i].getText() == "X") {
-                countX++;
-            }
-        }
-        
-        if (countX == 3) {
-            return "X";
-        } else if (countO == 3) {
-            return "O";
-        }
-
-        countX = 0;
-        countO = 0;
-
-        /*draw*/
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (buttons[i][j].getText() == "O") {
-                    countO++;
-                } else if (buttons[i][j].getText() == "X") {
-                    countX++;
-                }
-            }
-
-        }
-
-        if (countX == 5) {
-            countX = 0;
-            countO = 0;
-            return "DRAW";
-        }
-
-        return "";
-    }
 }
