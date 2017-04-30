@@ -1,0 +1,13 @@
+if you first
+button.setText("X");
+board[x][y] = 1;
+current.maxNode = false;
+notb = 2
+nota = true
+
+if x first
+button.setText("O");
+board[x][y] = 2;
+current.maxNode = true;
+notb = 1
+nota = false
