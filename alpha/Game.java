@@ -1,3 +1,11 @@
+/*
+    John Edward Pascual
+    Andrea Marie Santos
+    T-4L
+    May 1, 2017
+        Update: Added documentation and cleaned up code
+*/
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -8,22 +16,23 @@ public class Game {
     /* Elements used to build the board */
     private JFrame frame;
     private Container container;
-    private JPanel mainPanel;
-    private JPanel northPanel;
-    private JPanel scoresPanel;
+    private JPanel mainPanel, northPanel, scoresPanel, buttonPanel;
     private JLabel pScore, aiScore, drawScore;
     private JButton reset;
-    private JPanel buttonPanel;
     private JButton[][] buttons;
-    private int turnNumber;
     private int[][] board;
     private int pScoreInt = 0, aiScoreInt = 0, drawScoreInt = 0;
+
+    /* Used to choose the next AI move */
     private MinMax minmax;
     private Boolean playerFirst;
-    private int player;
-    String a, nota;
-    int b, notb;
-    boolean c;
+    private int turnNumber;
+
+    /* Settings for player/AI turn */
+    private int player; // Used to check if player goes first or not
+    private String playerMarker, aiMarker;
+    private int playerGridMarker, aiGridMarker;
+    private Boolean aiMaxNode;
 
     // Set up the board 
     public Game() {
@@ -37,7 +46,7 @@ public class Game {
         container = frame.getContentPane();
         // Main panel setup
         mainPanel = new JPanel(new BorderLayout());
-        // North Panel setup
+        // North Panel setup - holds scores and reset button
         northPanel = new JPanel(new GridLayout(2,1));
         scoresPanel = new JPanel(new GridLayout(1, 3));
         // Score labels setup
@@ -77,12 +86,13 @@ public class Game {
         mainPanel.add(northPanel, BorderLayout.NORTH);
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
         
+        // Putting into the frame
         container.add(mainPanel);
         frame.pack();
         frame.setVisible(true);
 
 
-        // Create a copy of the board (used for state)
+        // Create a copy of the board (used for States)
         board = new int[3][3]; // 1 = x, 2 = z0
 
         selectPlayer();
@@ -90,49 +100,76 @@ public class Game {
 
     }
 
-    public void xFirst(int[][] board) {
-        // For testing purposes only
-        if (player == 1) {
-            State state = new State(board);
-            // state.setFinishedState("X");
+    /* Allows the player to choose whether or not they make the first move */
+    public void selectPlayer() {
+        String[] buttons = { "X", "O" };
 
-            // Used for deciding the next AI move
-            //minmax = new MinMax(state);
-            // select random tile to put AI's first move in
-            state.maxNode = true;
+        player = JOptionPane.showOptionDialog(null, "Choose: ", "Confirmation",
+        JOptionPane.WARNING_MESSAGE, 1, null, buttons, buttons[1]);
+
+        if (player == 0) { // Player goes first
+            playerMarker = "X";
+            playerGridMarker = 1;
+            aiMaxNode = false;
+            aiMarker = "O";
+            aiGridMarker = 2;
+        } else if (player == 1) { // AI goes first
+            playerMarker = "O";
+            playerGridMarker = 2;
+            aiMaxNode = true;
+            aiMarker = "X";
+            aiGridMarker = 1;
+        } else {
+            System.exit(0);
+        }
+    }
+
+    /* Creates settings for the game if the player chooses the AI to go first */
+    public void xFirst(int[][] board) {
+        if (player == 1) { // Player chose AI to go first
+            State state = new State(board);
+            state.maxNode = true; // AI maximizes chances of winning
+
             // Do MinMax on the current state
             MinMax mm = new MinMax(state, true);
-            // Get the next move from MinMax
-            int[] nextMove = mm.getNextMove();
-            // Set the board according to next move
+            int[] nextMove = mm.getNextMove(); // Tile coordinates for X move
             board[nextMove[0]][nextMove[1]] = 1;
             buttons[nextMove[0]][nextMove[1]].setText("X");
         }
 
     }
 
+    /*
+        The decision of the next AI move is activated on click.
+        Using settings derived from selectPlayer(), this puts on the board the
+        icons of the player or AI. They are used to set the AI's playing style
+        (if it should minimize chances of player wins/maximize chances of it
+        winning). Checkers for draw or wins are also present here.
+    */
     public void setAl(JButton button, int x, int y) {
         ActionListener al = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (button.getText().equals("")) {   
-                    if (turnNumber % 2 == 0) {
-                        button.setText(a);
-                        board[x][y] = b;
+                if (button.getText().equals("")) {  // Empty tile
+                    if (turnNumber % 2 == 0) { // Player moves first
+                        // Use settings from selectPlayer()
+                        button.setText(playerMarker);
+                        board[x][y] = playerGridMarker;
+
                         // Create a new State class with the current setup
                         State current = new State(board);
-                        current.maxNode = c;
+                        current.maxNode = aiMaxNode;
 
-                        if (checkIfDraw(current))
+                        if (checkIfDraw(current)) // game is a draw
                             return ;
 
                         // Do MinMax on the current state
-                        MinMax mm = new MinMax(current, c);
+                        MinMax mm = new MinMax(current, aiMaxNode);
 
                         // Get the next move from MinMax
                         int[] nextMove = mm.getNextMove();
                         // Set the board according to next move
-                        board[nextMove[0]][nextMove[1]] = notb;
-                        buttons[nextMove[0]][nextMove[1]].setText(nota);
+                        board[nextMove[0]][nextMove[1]] = aiGridMarker;
+                        buttons[nextMove[0]][nextMove[1]].setText(aiMarker);
                         turnNumber += 1;
 
                         if (checkIfDraw(current))
@@ -142,6 +179,7 @@ public class Game {
 
                     State current = new State(board);
 
+                    // Checker for wins/draws are in the State class
                     if (current.checker() == "X") {
                         JOptionPane.showMessageDialog(frame, "X wins!");
                         State finished = new State(board);
@@ -170,6 +208,7 @@ public class Game {
                             pScore.setText("Player: " + pScoreInt);
                         }
 
+                        // Resets the game and allows players to choose X or O
                         resetFunc();
                     }
                 }
@@ -178,6 +217,7 @@ public class Game {
         button.addActionListener(al);
     }
 
+    /* Checks if the game resulted in a draw */
     public boolean checkIfDraw(State current) {
         if (current.checker() == "DRAW") {
             JOptionPane.showMessageDialog(frame, "Draw");
@@ -191,7 +231,7 @@ public class Game {
         return false;
     }
 
-    // For resetting the board
+    /* For resetting the board */
     public void setResetAL(JButton reset) {
         ActionListener resetAL = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -206,7 +246,6 @@ public class Game {
         reset.addActionListener(resetAL);
     }
 
-
     public void resetFunc() {
         Random rand = new Random();
         for (int i=0; i<3; i++) {
@@ -217,34 +256,12 @@ public class Game {
         }
         turnNumber = 0;
 
+        // Player chooses if they are X or O
         selectPlayer();
         xFirst(board);
     }
 
-    public void selectPlayer() {
-        String[] buttons = { "X", "O" };
-
-        player = JOptionPane.showOptionDialog(null, "Choose: ", "Confirmation",
-        JOptionPane.WARNING_MESSAGE, 1, null, buttons, buttons[1]);
-
-        if (player == 0) {
-            a = "X";
-            b = 1;
-            c = false;
-            nota = "O";
-            notb = 2;
-        } else if (player == 1) {
-            a = "O";
-            b = 2;
-            c = true;
-            nota = "X";
-            notb = 1;
-        } else {
-            System.exit(0);
-        }
-    }
-
-    // Temporary colors until PRETTIER NOTICE
+    /* Sets style and color of the Tic Tac Toe game */
     public void colorize() {
         pScore.setForeground(new Color(111, 156, 235));
         aiScore.setForeground(new Color(111, 156, 235));

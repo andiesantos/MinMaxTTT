@@ -1,4 +1,10 @@
 /*
+    John Edward Pascual
+    Andrea Marie Santos
+    T-4L
+    May 1, 2017
+        Update: Added documentation and cleaned up code
+	
 	This class will be used to check the best movement of the AI upon its turn.
 */
 import java.util.ArrayList;
@@ -13,16 +19,11 @@ public class MinMax {
 	public MinMax(State s, Boolean mm) {
 		nextStates = new ArrayList<State>();
 		name = setState(s, mm);
-
 		value(s);
-		//System.out.println("====FINAL MOVE " + s.nextMove + "====");
 		next = s.nextStates.get(s.nextMove);
-
-		next.printState();
-		//s.printState();
-		//next.printState();
 	}
 
+	/* Get the next move of the AI as recommended by the MinMax algorithm */
 	public int[] getNextMove() {
 		// Compare new state with the current board
 		int[] nextMove = new int[2];
@@ -43,9 +44,11 @@ public class MinMax {
 	public String setState(State s, Boolean mm) {
 		this.currentState = s;
 		s.maxNode = mm; // starting state maximizes the chances of the AI win
+
+		// Checks if the game is a draw
 		int countO = 0;
 		int countX = 0;
-		// if true, max; else, min
+		// If true, max; else, min
 		for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (s.board[i][j] == 2) {
@@ -65,12 +68,11 @@ public class MinMax {
         return "";
 	}
 
+	/* Get the max value of each successor (state) */
 	public int max_value(State s) {
 		int v = 0;
 		Integer m = (Integer.MAX_VALUE) * -1;
 		State next;
-		// Get the max value of each successor (state)
-		//System.out.println(s.m);
 		if (s.nextStates.size() != 0) {
 			for (int i=0; i<s.nextStates.size(); i++) {
 				next = s.nextStates.get(i);
@@ -78,24 +80,18 @@ public class MinMax {
 				if (v > m) {
 					m = v;
 					s.nextMove = i;
-					//System.out.println("Set new nextMove");
 				}
 			}
-			//System.out.println("====NEXT MAX MOVE " + s.nextMove + "====");
-			s.printState();
 			next = s.nextStates.get(s.nextMove);
-			next.printState();
 		}
-		//System.out.println("\n\n\n");
 		return m;
 	}
 	
+	/* Get the min value of each successor (state) */
 	public int min_value(State s) {
 		int v = 0;
 		Integer m = Integer.MAX_VALUE;
 		State next;
-		// Get the min value of each successor (state)
-		//System.out.println(s.m);
 		if (s.nextStates.size() != 0) {
 			for (int i=0; i<s.nextStates.size(); i++) {
 				next = s.nextStates.get(i);
@@ -103,24 +99,19 @@ public class MinMax {
 				if (v < m) {
 					m = v;
 					s.nextMove = i;
-					//System.out.println("Set new nextMove");
 				}
 			}
-			//System.out.println("====NEXT MIN MOVE " + s.nextMove + "====");
-			s.printState();
 			next = s.nextStates.get(s.nextMove);
-			next.printState();
 
 		}
-		//System.out.println("\n\n\n");
 		return m;
 	}
 
+	/* Gets the value of X from the utility */
 	public int value(State s) {
 		int ret = 1000;
 		if (s.checkIfTerminal() == true) {
 			int[] util = s.getUtility();
-			//System.out.println(util[0] + " " + util[1]);
 			s.nextMove = 0;
 			ret = util[0];
 			return ret;
