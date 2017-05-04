@@ -1,9 +1,9 @@
 /*
     John Edward Pascual
     Andrea Marie Santos
-    T-4L
-    May 1, 2017
-        Update: Added documentation and cleaned up code
+    U-7L
+    May 4, 2017
+        Update: Tic tac toe implements "Alpha-beta pruning" algorithm
 */
 
 import javax.swing.*;
@@ -33,6 +33,9 @@ public class Game {
     private String playerMarker, aiMarker;
     private int playerGridMarker, aiGridMarker;
     private Boolean aiMaxNode;
+
+    private int alpha = -99;
+    private int beta = 99;
 
     // Set up the board 
     public Game() {
@@ -130,8 +133,10 @@ public class Game {
             State state = new State(board);
             state.maxNode = true; // AI maximizes chances of winning
 
+            // System.out.println("out " + alpha + " " + beta);
             // Do MinMax on the current state
             MinMax mm = new MinMax(state, true);
+            // System.out.println("out " + alpha + " " + beta);
             int[] nextMove = mm.getNextMove(); // Tile coordinates for X move
             board[nextMove[0]][nextMove[1]] = 1;
             buttons[nextMove[0]][nextMove[1]].setText("X");
@@ -161,10 +166,12 @@ public class Game {
 
                         if (checkIfDraw(current)) // game is a draw
                             return ;
+                        // System.out.println("in " + alpha + " " + beta);
 
                         // Do MinMax on the current state
                         MinMax mm = new MinMax(current, aiMaxNode);
 
+                        // System.out.println("in " + alpha + " " + beta);
                         // Get the next move from MinMax
                         int[] nextMove = mm.getNextMove();
                         // Set the board according to next move

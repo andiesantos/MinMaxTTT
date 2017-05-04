@@ -1,9 +1,9 @@
 /*
     John Edward Pascual
     Andrea Marie Santos
-    T-4L
-    May 1, 2017
-        Update: Added documentation and cleaned up code
+    U-7L
+    May 4, 2017
+        Update: Tic tac toe implements "Alpha-beta pruning" algorithm
 */
 
 import java.util.ArrayList;
