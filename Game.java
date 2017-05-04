@@ -242,12 +242,7 @@ public class Game {
     public void setResetAL(JButton reset) {
         ActionListener resetAL = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                turnNumber = 0;
-                for (int i=0; i<3; i++) {
-                    for (int j=0; j<3; j++) {
-                        buttons[i][j].setText("");
-                    } 
-                }
+                resetFunc();
             }
         };
         reset.addActionListener(resetAL);
